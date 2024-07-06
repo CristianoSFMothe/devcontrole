@@ -2,8 +2,8 @@ import { Container } from "@/components/container";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { TicketItem } from "./components/ticket";
+import CustomLinkButton from "./components/link";
 
 const Dashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -18,12 +18,9 @@ const Dashboard = async () => {
         <div className="flex items-center justify-between dashboard-new">
           <h1 className="text-white text-3xl font-bold">Chamados</h1>
 
-          <Link
-            href="/dashboard/new"
-            className="bg-blue-500 px-4 py-1 rounded text-white btn-dashboard-new"
-          >
+          <CustomLinkButton href="/dashboard/new" className="btn-dashboard-new">
             Abrir novo chamado
-          </Link>
+          </CustomLinkButton>
         </div>
 
         <table className="min-w-full my-2 bg-white rounded">

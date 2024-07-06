@@ -1,5 +1,5 @@
 import { Container } from "@/components/container";
-import CustomLinkButton from "@/app/dashboard/components/link";
+import CustomLinkButton from "@/components/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";

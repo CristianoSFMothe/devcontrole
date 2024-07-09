@@ -28,7 +28,44 @@ export const POST = async (request: Request) => {
     );
   } catch (err) {
     return NextResponse.json(
-      { erro: "Failed create a new customer" },
+      { erro: "Falha ao criar um novo cliente" },
+      { status: 400 }
+    );
+  }
+};
+
+export const DELETE = async (request: Request) => {
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+
+  const userId = searchParams.get("id");
+
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Falha ao delete cliente" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await prismaClient.customer.delete({
+      where: {
+        id: userId as string,
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Cliente cadastrado com sucesso!" },
+      { status: 200 }
+    );
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Falha ao delete cliente" },
       { status: 400 }
     );
   }

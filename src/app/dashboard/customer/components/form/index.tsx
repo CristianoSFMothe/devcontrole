@@ -99,7 +99,7 @@ export function NewCustomerForm({ userId }: { userId: string }) {
           <Input
             type="text"
             name="phone"
-            placeholder="Exemplo (DD) 999887766"
+            placeholder="Exemplo (DD) 999999999"
             error={errors.phone?.message}
             register={register}
           />

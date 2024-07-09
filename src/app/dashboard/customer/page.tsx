@@ -40,6 +40,10 @@ const Customer = async () => {
             />
           ))}
         </section>
+
+        {customers.length === 0 && (
+          <h1 className="text-gray-200">Você ainda não possui nenhum cliente</h1>
+        )}
       </main>
     </Container>
   );

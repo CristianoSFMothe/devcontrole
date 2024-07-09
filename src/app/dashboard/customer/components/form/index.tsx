@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 const schema = z.object({
+  // TODO: validar o nome para ser único
   name: z
     .string()
     .min(1, "O campo nome é obrigatório.")
@@ -66,8 +67,9 @@ export function NewCustomerForm({ userId }: { userId: string }) {
     });
 
     // TODO: utilizar o Toast para notificação
+    router.refresh();
 
-    router.replace("/dashboard/customer")
+    router.replace("/dashboard/customer");
   };
 
   return (

@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/input";
+import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
   name: z
@@ -43,7 +45,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export function NewCustomerForm() {
+export function NewCustomerForm({ userId }: { userId: string }) {
   const {
     register,
     handleSubmit,
@@ -52,8 +54,20 @@ export function NewCustomerForm() {
     resolver: zodResolver(schema),
   });
 
-  const handleRegisterCustomer = (data: FormData) => {
-    console.log(data);
+  const router = useRouter();
+
+  const handleRegisterCustomer = async (data: FormData) => {
+    await api.post("/api/customer", {
+      name: data.name,
+      phone: data.phone,
+      email: data.email,
+      address: data.address,
+      userId: userId
+    });
+
+    // TODO: utilizar o Toast para notificação
+
+    router.replace("/dashboard/customer")
   };
 
   return (

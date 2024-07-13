@@ -67,9 +67,9 @@ export function NewCustomerForm({ userId }: { userId: string }) {
     });
 
     // TODO: utilizar o Toast para notificação
+    router.replace("/dashboard/customer");
     router.refresh();
 
-    router.replace("/dashboard/customer");
   };
 
   return (

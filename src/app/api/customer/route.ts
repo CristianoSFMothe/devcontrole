@@ -52,6 +52,19 @@ export const DELETE = async (request: Request) => {
     );
   }
 
+  const findTickets = await prismaClient.ticket.findFirst({
+    where: {
+      customerId: userId
+    }
+  })
+
+  if(findTickets) {
+    return NextResponse.json(
+      { error: "Falha ao delete cliente" },
+      { status: 400 }
+    );
+  }
+
   try {
     await prismaClient.customer.delete({
       where: {

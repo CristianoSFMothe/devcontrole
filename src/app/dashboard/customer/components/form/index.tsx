@@ -78,7 +78,7 @@ export function NewCustomerForm({ userId }: { userId: string }) {
       onSubmit={handleSubmit(handleRegisterCustomer)}
       noValidate
     >
-      <label className="mb-1 text-lg font-medium text-white">
+      <label className="mb-1 text-lg font-medium  text-gray-300">
         Nome Completo
       </label>
 
@@ -92,7 +92,7 @@ export function NewCustomerForm({ userId }: { userId: string }) {
 
       <section className="flex gap-2 mt-2 my-2 flex-col sm:flex-row">
         <div className="flex-1">
-          <label className="mb-1 text-lg font-medium text-white">
+          <label className="mb-1 text-lg font-medium  text-gray-300">
             Telefone
           </label>
 
@@ -106,7 +106,7 @@ export function NewCustomerForm({ userId }: { userId: string }) {
         </div>
 
         <div className="flex-1">
-          <label className="mb-1 text-lg font-medium text-white">E-mail</label>
+          <label className="mb-1 text-lg font-medium  text-gray-300">E-mail</label>
 
           <Input
             type="email"
@@ -118,7 +118,7 @@ export function NewCustomerForm({ userId }: { userId: string }) {
         </div>
       </section>
 
-      <label className="mb-1 text-lg font-medium text-white">
+      <label className="mb-1 text-lg font-medium  text-gray-300">
         Endereço completo
       </label>
 

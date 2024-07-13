@@ -6,9 +6,16 @@ interface CustomLinkButtonProps extends LinkProps {
   className?: string;
 }
 
-const CustomLinkButton: FC<CustomLinkButtonProps> = ({ href, children, className }) => {
+const CustomLinkButton: FC<CustomLinkButtonProps> = ({
+  href,
+  children,
+  className,
+}) => {
   return (
-    <Link href={href} className={`bg-blue-500 px-4 py-1 rounded text-white hover:opacity-75 ${className}`}>
+    <Link
+      href={href}
+      className={`bg-blue-500 px-4 py-1 rounded font-bold text-white hover:opacity-75 ${className}`}
+    >
       {children}
     </Link>
   );

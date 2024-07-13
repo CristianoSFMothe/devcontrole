@@ -16,7 +16,6 @@ const Dashboard = async () => {
   const tickets = await prismaClient.ticket.findMany({
     where: {
       userId: session.user.id,
-      status: "ABERTO",
     },
     include: {
       customer: true,
@@ -55,6 +54,10 @@ const Dashboard = async () => {
             ))}
           </tbody>
         </table>
+
+        {tickets.length === 0 && (
+          <h1 className="px2 md:px-0 text-gray-300">Nenhum chamado aberto foi encontrado...</h1>
+        )}
       </main>
     </Container>
   );

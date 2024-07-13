@@ -18,6 +18,32 @@ export default async function NewTicket() {
     },
   });
 
+  const handleRegisterTicket = async (formData: FormData) => {
+    "use server"
+
+    const name = formData.get("name")
+    const description = formData.get("description")
+    const customerId = formData.get("customer")
+
+    if(!name || !description || !customerId) {
+      return;
+      // TODO: Usar o Toast para mensagem
+    }
+
+    await prismaClient.ticket.create({
+      data: {
+        name: name as string,
+        description: description as string,
+        customerId: customerId as string,
+        status: "ABERTO",
+        userId: session?.user.id
+      }
+    })
+
+    console.log("CHAMADA CRIADO COM SUCESSO!")
+    redirect("/dashboard");
+  }
+
   return (
     <Container>
       <main className="mt-9 mb-2">
@@ -28,14 +54,14 @@ export default async function NewTicket() {
           <h2 className="text-3xl font-bold text-white">Novo chamado</h2>
         </div>
 
-        <form className="flex flex-col mt-6">
+        <form className="flex flex-col mt-6" action={handleRegisterTicket} noValidate>
           <label className="mb-1 font-medium text-lg text-gray-300">
             Nome do chamado
           </label>
           <input
             className="w-full border-2 rounded-md px-2 mb-2 h-11"
             type="text"
-            name="ticket-name"
+            name="name"
             placeholder="Digite o nome do chamado..."
             required
           />
@@ -44,7 +70,7 @@ export default async function NewTicket() {
           </label>
           <textarea
             className="w-full border-2 rounded-md px-2 mb-2 h-28 resize-none"
-            name="ticket-description"
+            name="description"
             placeholder="Descreva o problema..."
             required
           ></textarea>
@@ -54,7 +80,14 @@ export default async function NewTicket() {
               <label className="mb-1 font-medium text-lg text-gray-300">
                 Selecione o cliente
               </label>
-              <select className="w-full border-2 rounded-md px-2 mb-2 h-11 resize-none bg-white">
+              <select
+                className="w-full border-2 rounded-md px-2 mb-2 h-11 resize-none bg-white"
+                name="customer"
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Selecione um cliente
+                </option>
                 {customers.map((customer) => (
                   <option key={customer.id} value={customer.id}>
                     {customer.name}

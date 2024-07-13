@@ -1,16 +1,23 @@
+import { CustomerProps } from "@/utils/customer.type";
+import { TicketProps } from "@/utils/ticket.type";
 import { FiTrash2, FiFile } from "react-icons/fi";
 
-export function TicketItem() {
+interface TicketItemProps {
+  ticket: TicketProps;
+  customer: CustomerProps | null
+}
+
+export function TicketItem({ customer, ticket }: TicketItemProps) {
   return (
     <>
       <tr className="border-b-2 border-b-slate-200 h-16 last:border-b-0 hover:bg-gray-100 duration-300">
         <td className="text-left px-4 customer-name">
-          Mercado Silva
+          {customer?.name}
         </td>
-        <td className="text-left hidden sm:table-cell date-register">05/07/2024</td>
+        <td className="text-left hidden sm:table-cell date-register">{ticket.created_at?.toLocaleDateString("pt-br") }</td>
         <td className="text-left">
           <span className="bg-green-500 px-2 py-1 rounded-lg status">
-            ABERTO
+            {ticket.status}
           </span>
         </td>
         <td className="text-left">

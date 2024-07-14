@@ -105,6 +105,4 @@ export const GET = async (request: Request) => {
   }catch(err) {
     return NextResponse.json({ message: "Cliente não encontrado"}, { status: 400 })
   }
-
-  return NextResponse.json({ message: "email recebido"}, { status: 200 })
 }

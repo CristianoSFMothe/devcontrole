@@ -4,6 +4,8 @@ import { Input } from "@/components/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { api } from "@/lib/api";
+import { CustomerDataInfo } from "../../page";
 
 const schema = z.object({
   name: z.string().min(1, "O campo nome do chamado é obrigatório"),
@@ -12,7 +14,11 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export function FormTicket() {
+interface FormTicketProps {
+  customer: CustomerDataInfo
+}
+
+export function FormTicket({ customer }: FormTicketProps) {
   const {
     register,
     handleSubmit,
@@ -22,8 +28,23 @@ export function FormTicket() {
     resolver: zodResolver(schema),
   });
 
+  const handleRegisterTicket = async (data: FormData) => {
+    const response = await api.post("/api/ticket", {
+      name: data.name,
+      description: data.description,
+      customerId: customer.id
+    })
+
+    // TODO: Usar o Toast para mensagem
+    setValue("name", "")
+    setValue("description", "")
+  };
+
   return (
-    <form className="bg-slate-200 mt-6 px-4 py-6 rounded">
+    <form
+      className="bg-slate-200 mt-6 px-4 py-6 rounded"
+      onSubmit={handleSubmit(handleRegisterTicket)}
+    >
       <label className="mb-1 font-medium text-lg">Nome do chamado</label>
       <Input
         register={register}
@@ -35,7 +56,7 @@ export function FormTicket() {
 
       <label className="mb-1 font-medium text-lg">Descreva o problema</label>
       <textarea
-        className="w-full border-2 rounded-md h-28 resize-none mb-2 px-2 description"
+        className="w-full border-2 rounded-md h-28 resize-none px-2 description"
         placeholder="Descreva sobre o seu problema..."
         id="description"
         {...register("description")}
@@ -46,7 +67,8 @@ export function FormTicket() {
 
       <button
         type="submit"
-        className="bg-blue-500 text-white px-2 w-full h-11 rounded-md font-bold btn-register hover:opacity-85 duration-300"
+        className="bg-blue-500 text-white px-2 w-full h-11 mt-1 mb-4 
+          rounded-md font-bold btn-register hover:opacity-85 duration-300"
       >
         Cadastrar
       </button>

@@ -46,7 +46,7 @@ export function FormTicket() {
 
       <button
         type="submit"
-        className="bg-blue-500 text-white px-2 w-full h-11 rounded-md font-bold btn-register"
+        className="bg-blue-500 text-white px-2 w-full h-11 rounded-md font-bold btn-register hover:opacity-85 duration-300"
       >
         Cadastrar
       </button>

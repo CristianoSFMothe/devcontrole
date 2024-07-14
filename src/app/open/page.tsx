@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FiSearch, FiX } from "react-icons/fi";
 import { FormTicket } from "./components/FormTicket";
+import { api } from "@/lib/api";
 
 const schema = z.object({
   email: z
@@ -30,6 +31,7 @@ export default function OpenTicket() {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -39,6 +41,24 @@ export default function OpenTicket() {
     setCustomer(null);
     setValue("email", "");
   };
+
+  const handleSearchCustomer = async (data: FormData) => {
+    const response = await api.get("/api/customer", {
+      params: {
+        email: data.email,
+      }
+    })
+
+    if(response.data === null) {
+      setError("email", { type: "custom", message: "Oops, cliente não foi encontrado!"})
+      return;
+    }
+
+    setCustomer({
+      id: response.data.id,
+      name: response.data.name
+    })
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto px-2">
@@ -53,14 +73,14 @@ export default function OpenTicket() {
               <strong>Cliente selecionado:</strong> {customer.name}
             </p>
             <button
-              className="h-11 px-2 flex items-center justify-center btn-clear rounded"
+              className="h-11 px-2 flex items-center justify-center btn-clear rounded hover:scale-125 duration-300 "
               onClick={handleClearCustomer}
             >
               <FiX size={30} color="#FF2929" />
             </button>
           </div>
         ) : (
-          <form className="bg-slate-200 py-6 px-2 rounded border-2">
+          <form className="bg-slate-200 py-6 px-2 rounded border-2" onSubmit={handleSubmit(handleSearchCustomer)}>
             <div className="flex flex-col gap-3">
               <Input
                 name="email"
@@ -75,7 +95,9 @@ export default function OpenTicket() {
                 flex flex-row gap-3 
                 px-2 h-11 items-center 
                 justify-center text-white 
-                font-bold btn-search rounded"
+                font-bold btn-search rounded
+                hover:opacity-85 duration-300"                
+                type="submit"
               >
                 Procurar cliente...
                 <FiSearch size={24} color="#FFF" />

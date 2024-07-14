@@ -20,6 +20,9 @@ const Dashboard = async () => {
     include: {
       customer: true,
     },
+    orderBy: {
+      created_at: "desc"
+    }
   });
 
   return (

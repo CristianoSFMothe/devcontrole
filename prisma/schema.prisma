@@ -38,7 +38,7 @@ model Ticket {
   created_at  DateTime? @default(now())
   updated_at  DateTime? @default(now())
 
-  customerId String    @db.ObjectId
+  customerId String?   @db.ObjectId
   customer   Customer? @relation(fields: [customerId], references: [id])
 
   userId String? @db.ObjectId

@@ -4,105 +4,297 @@ import { authOptions } from "@/lib/auth";
 import prismaClient from "@/lib/prisma";
 
 export const POST = async (request: Request) => {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user) {
-    return NextResponse.json({ erro: "Not authorized" }, { status: 401 });
-  }
-
-  const { name, email, phone, address, userId } = await request.json();
-
   try {
-    await prismaClient.customer.create({
-      data: {
-        name,
-        phone,
-        email,
-        address: address ? address : "",
-        userId: userId,
-      },
-    });
-    return NextResponse.json(
-      { message: "Cliente cadastrado com sucesso" },
-      { status: 202 }
-    );
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Not authorized",
+            data: {},
+          },
+          null,
+          2
+        ),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { name, email, phone, address, userId } = await request.json();
+
+    if (!name || !email || !phone || !userId) {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Missing required fields",
+            data: { request: { name, email, phone, address, userId } },
+          },
+          null,
+          2
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    try {
+      const newCustomer = await prismaClient.customer.create({
+        data: {
+          name,
+          phone,
+          email,
+          address: address ? address : "",
+          userId: userId,
+        },
+      });
+
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: true,
+            message: "Cliente cadastrado com sucesso",
+            data: {
+              request: { name, email, phone, address, userId },
+              newCustomer,
+            },
+          },
+          null,
+          2
+        ),
+        { status: 201, headers: { "Content-Type": "application/json" } }
+      );
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Erro desconhecido";
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Falha ao criar um novo cliente",
+            data: {
+              request: { name, email, phone, address, userId },
+              error: errorMessage,
+            },
+          },
+          null,
+          2
+        ),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
   } catch (err) {
-    return NextResponse.json(
-      { erro: "Falha ao criar um novo cliente" },
-      { status: 400 }
+    const errorMessage =
+      err instanceof Error ? err.message : "Erro desconhecido";
+    return new NextResponse(
+      JSON.stringify(
+        {
+          success: false,
+          message: "Falha ao processar a requisição",
+          data: { error: errorMessage },
+        },
+        null,
+        2
+      ),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
 
 export const DELETE = async (request: Request) => {
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user) {
-    return NextResponse.json({ erro: "Não autorizado" }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(request.url);
-
-  const userId = searchParams.get("id");
-
-  if (!userId) {
-    return NextResponse.json(
-      { error: "Falha ao delete cliente" },
-      { status: 400 }
-    );
-  }
-
-  const findTickets = await prismaClient.ticket.findFirst({
-    where: {
-      customerId: userId
-    }
-  })
-
-  if(findTickets) {
-    return NextResponse.json(
-      { error: "Falha ao delete cliente" },
-      { status: 400 }
-    );
-  }
-
   try {
-    await prismaClient.customer.delete({
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Not authorized",
+            data: {},
+          },
+          null,
+          2
+        ),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("id");
+
+    if (!userId) {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Missing required parameter: id",
+            data: {},
+          },
+          null,
+          2
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const findTickets = await prismaClient.ticket.findFirst({
       where: {
-        id: userId as string,
+        customerId: userId,
       },
     });
 
-    return NextResponse.json(
-      { message: "Cliente cadastrado com sucesso!" },
-      { status: 200 }
-    );
+    if (findTickets) {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Cannot delete customer with existing tickets",
+            data: {},
+          },
+          null,
+          2
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    try {
+      const deletedCustomer = await prismaClient.customer.delete({
+        where: {
+          id: userId as string,
+        },
+      });
+
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: true,
+            message: "Cliente removido com sucesso",
+            data: { deletedCustomer },
+          },
+          null,
+          2
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Erro desconhecido";
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Falha ao remove o cliente",
+            data: { error: errorMessage },
+          },
+          null,
+          2
+        ),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
   } catch (err) {
-    return NextResponse.json(
-      { error: "Falha ao delete cliente" },
-      { status: 400 }
+    const errorMessage =
+      err instanceof Error ? err.message : "Erro desconhecido";
+    return new NextResponse(
+      JSON.stringify(
+        {
+          success: false,
+          message: "Falha ao processar a solicitação",
+          data: { error: errorMessage },
+        },
+        null,
+        2
+      ),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };
 
 export const GET = async (request: Request) => {
-  const { searchParams } = new URL(request.url);
-  const customerEmail = searchParams.get("email")
+  try {
+    const { searchParams } = new URL(request.url);
+    const customerEmail = searchParams.get("email");
 
-  if(!customerEmail || customerEmail === "") {
-    return NextResponse.json({ message: "Cliente não encontrado"}, { status: 400 })
-    
-  }
+    if (!customerEmail || customerEmail.trim() === "") {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Parâmetro de e-mail ausente ou vazio",
+            data: {},
+          },
+          null,
+          2
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-  try{
-    const customer = await prismaClient.customer.findFirst({
-      where: {
-        email: customerEmail
+    try {
+      const customer = await prismaClient.customer.findFirst({
+        where: {
+          email: customerEmail,
+        },
+      });
+
+      if (!customer) {
+        return new NextResponse(
+          JSON.stringify(
+            {
+              success: false,
+              message: "Cliente não encontrado",
+              data: {},
+            },
+            null,
+            2
+          ),
+          { status: 404, headers: { "Content-Type": "application/json" } }
+        );
       }
-    })
 
-    return NextResponse.json(customer)
-
-  }catch(err) {
-    return NextResponse.json({ message: "Cliente não encontrado"}, { status: 400 })
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: true,
+            message: "Cliente recuperado com sucesso",
+            data: { customer },
+          },
+          null,
+          2
+        ),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "Failed to retrieve customer",
+            data: { error: errorMessage },
+          },
+          null,
+          2
+        ),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+    return new NextResponse(
+      JSON.stringify(
+        {
+          success: false,
+          message: "Falha ao processar a solicitação",
+          data: { error: errorMessage },
+        },
+        null,
+        2
+      ),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
-}
+};

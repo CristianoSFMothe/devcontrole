@@ -133,7 +133,7 @@ export const DELETE = async (request: Request) => {
         JSON.stringify(
           {
             success: false,
-            message: "Not authorized",
+            message: "Não autorizado",
             data: {},
           },
           null,
@@ -151,7 +151,7 @@ export const DELETE = async (request: Request) => {
         JSON.stringify(
           {
             success: false,
-            message: "Missing required parameter: id",
+            message: "Parâmetro obrigatório ausente",
             data: {},
           },
           null,
@@ -172,7 +172,7 @@ export const DELETE = async (request: Request) => {
         JSON.stringify(
           {
             success: false,
-            message: "Cannot delete customer with existing tickets",
+            message: "Não é possível excluir cliente com chamados existentes",
             data: {},
           },
           null,
@@ -295,7 +295,7 @@ export const GET = async (request: Request) => {
         JSON.stringify(
           {
             success: false,
-            message: "Failed to retrieve customer",
+            message: "Falha ao recuperar o cliente",
             data: { error: errorMessage },
           },
           null,

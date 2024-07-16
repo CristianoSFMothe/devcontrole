@@ -27,26 +27,22 @@ export default async function NewTicket() {
     const customerId = formData.get("customer")
 
     if(!name || !description || !customerId) {
-      toast.error("Por favor, preencha todos os campos.");
       return;
+      // TODO: Usar o Toast para mensagem
     }
-    try{
-      await prismaClient.ticket.create({
-        data: {
-          name: name as string,
-          description: description as string,
-          customerId: customerId as string,
-          status: "ABERTO",
-          userId: session?.user.id
-        }
-      })
-  
-      toast.success("Chamada criada com sucesso!");
-      redirect("/dashboard");
 
-    } catch(error) {
-      toast.error("Erro ao criar chamada. Tente novamente.");
-    }
+    await prismaClient.ticket.create({
+      data: {
+        name: name as string,
+        description: description as string,
+        customerId: customerId as string,
+        status: "ABERTO",
+        userId: session?.user.id
+      }
+    })
+
+    console.log("CHAMADA CRIADO COM SUCESSO!")
+    redirect("/dashboard");
   }
 
   return (

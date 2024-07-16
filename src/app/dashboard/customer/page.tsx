@@ -28,7 +28,7 @@ const Customer = async () => {
             href="/dashboard/customer/new"
             className="btn-customer-new"
           >
-            Abrir novo chamado
+            Cadastrar novo cliente
           </CustomLinkButton>
         </div>
 

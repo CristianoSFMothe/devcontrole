@@ -21,16 +21,14 @@ const schema = z.object({
   phone: z
     .string()
     .refine((value) => {
-      // Verifica se o valor contém apenas dígitos e espaços
       return /^[0-9\s]+$/.test(value);
     }, "O número de telefone não pode conter letras.")
     .refine((value) => {
-      // Verifica se o formato do número está correto
       const trimmedValue = value.trim();
       return (
         /^(?:\(\d{2}\)\s?)?\d{9}$/.test(trimmedValue) ||
         /^\d{2}\s\d{9}$/.test(trimmedValue) ||
-        /^\d{11}$/.test(trimmedValue) // Para números sem o código de área
+        /^\d{11}$/.test(trimmedValue) 
       );
     }, "O número de telefone deve estar no formato (DD) 999999999, DD 999999999 ou 999999999."),
   address: z.string().transform((value) => value.trim()),

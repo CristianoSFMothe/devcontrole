@@ -3,6 +3,8 @@
 import { CustomerProps } from "@/utils/customer.type";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { AiOutlineDelete, AiOutlineCloseCircle } from "react-icons/ai";
 
 const CardCustomer = ({ customer }: { customer: CustomerProps }) => {
   const router = useRouter();
@@ -15,14 +17,19 @@ const CardCustomer = ({ customer }: { customer: CustomerProps }) => {
         },
       });
 
-      // TODO: Usar o Toast para mensagem de delete
-      console.log(response.data);
+      toast.success("Cliente excluído com sucesso!", {
+        icon: <AiOutlineDelete style={{ color: 'red' }} />,
+        progressStyle: { background: 'red' },
+      });
+
       router.refresh()
       
     } catch (err) {
-      console.log(err);
+      toast.error("Erro ao excluir cliente. Tente novamente.", {
+        icon: <AiOutlineCloseCircle style={{ color: 'red' }} />,
+        progressStyle: { background: 'red' },
+      });
     }
-    // TODO: Usar o Toast para mensagem de delete
   };
 
   return (

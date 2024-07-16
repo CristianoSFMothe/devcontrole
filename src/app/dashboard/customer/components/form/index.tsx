@@ -6,42 +6,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/input";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const schema = z.object({
-  // TODO: validar o nome para ser único
   name: z
     .string()
     .min(1, "O campo nome é obrigatório.")
-    .refine(
-      (value) =>
-        /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s]+$/.test(value) && 
-        /^[^\d@#$%]+$/.test(value), 
-      {
-        message:
-          "O nome não pode começar com número ou conter caracteres especiais.",
-      }
-    )
-    .transform(value => value.trim()),
+    .transform((value) => value.trim()),
   email: z
     .string()
     .min(1, "O e-mail é obrigatório.")
     .email("Digite um e-mail válido.")
-    .transform(value => value.trim()),
-  phone: z.string().refine(
-    (value) => {
+    .transform((value) => value.trim()),
+  phone: z
+    .string()
+    .refine((value) => {
+      // Verifica se o valor contém apenas dígitos e espaços
+      return /^[0-9\s]+$/.test(value);
+    }, "O número de telefone não pode conter letras.")
+    .refine((value) => {
+      // Verifica se o formato do número está correto
+      const trimmedValue = value.trim();
       return (
-        (/^(?:\(\d{2}\)\s?)?\d{9}$/.test(value) ||
-          /^\d{2}\s\d{9}$/.test(value) ||
-          /^\d{11}$/.test(value)) &&
-        value.length <= 11
+        /^(?:\(\d{2}\)\s?)?\d{9}$/.test(trimmedValue) ||
+        /^\d{2}\s\d{9}$/.test(trimmedValue) ||
+        /^\d{11}$/.test(trimmedValue) // Para números sem o código de área
       );
-    },
-    {
-      message: "O número de telefone deve estar (DD) 999999999",
-    }
-  )
-  .transform(value => value.trim()),
-  address: z.string().transform(value => value.trim()),
+    }, "O número de telefone deve estar no formato (DD) 999999999, DD 999999999 ou 999999999."),
+  address: z.string().transform((value) => value.trim()),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -58,18 +50,21 @@ export function NewCustomerForm({ userId }: { userId: string }) {
   const router = useRouter();
 
   const handleRegisterCustomer = async (data: FormData) => {
-    await api.post("/api/customer", {
-      name: data.name,
-      phone: data.phone,
-      email: data.email,
-      address: data.address,
-      userId: userId
-    });
+    try {
+      await api.post("/api/customer", {
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        address: data.address,
+        userId: userId,
+      });
 
-    // TODO: utilizar o Toast para notificação
-    router.replace("/dashboard/customer");
-    router.refresh();
-
+      toast.success("Cliente criado com sucesso!");
+      router.replace("/dashboard/customer");
+      router.refresh();
+    } catch (error) {
+      toast.error("Já existe um cliente cadastro com o nome informado.");
+    }
   };
 
   return (
@@ -99,14 +94,16 @@ export function NewCustomerForm({ userId }: { userId: string }) {
           <Input
             type="text"
             name="phone"
-            placeholder="Exemplo (DD) 999999999"
+            placeholder="Exemplo DD 999999999"
             error={errors.phone?.message}
             register={register}
           />
         </div>
 
         <div className="flex-1">
-          <label className="mb-1 text-lg font-medium  text-gray-300">E-mail</label>
+          <label className="mb-1 text-lg font-medium  text-gray-300">
+            E-mail
+          </label>
 
           <Input
             type="email"

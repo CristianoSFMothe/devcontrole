@@ -39,6 +39,28 @@ export const POST = async (request: Request) => {
       );
     }
 
+    // Verificar se o nome já existe
+    const existingCustomer = await prismaClient.customer.findFirst({
+      where: {
+        name,
+      },
+    });
+
+    if (existingCustomer) {
+      return new NextResponse(
+        JSON.stringify(
+          {
+            success: false,
+            message: "O nome do cliente já está em uso. Escolha um nome diferente.",
+            data: { request: { name, email, phone, address, userId } },
+          },
+          null,
+          2
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     try {
       const newCustomer = await prismaClient.customer.create({
         data: {

@@ -25,14 +25,14 @@ export function TicketItem({ customer, ticket }: TicketItemProps) {
         id: ticket.id,
       });
 
-      // TODO: Implementar um Toast para mensagem de sucesso
+      // TODO: Implementar um Toast para mensagem de sucesso de alteração do status
       setStatus(response.data.status);
       router.refresh();
 
       console.log(response.data);
     } catch (err) {
       console.log(err);
-      // TODO: Implementar um Toast para notificar o erro
+      // TODO: Implementar um Toast para notificar o erro de alteração do status
     }
   };
 

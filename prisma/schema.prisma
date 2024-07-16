@@ -15,7 +15,7 @@ datasource db {
 
 model Customer {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  name       String // TODO: Modificar para o nome ser único
+  name       String    @unique
   phone      String
   email      String
   address    String?

@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ModalContext } from "@/providers/modal";
+import { toast } from 'react-toastify';
 
 interface TicketItemProps {
   ticket: TicketProps;
@@ -25,14 +26,13 @@ export function TicketItem({ customer, ticket }: TicketItemProps) {
         id: ticket.id,
       });
 
-      // TODO: Implementar um Toast para mensagem de sucesso de alteração do status
+      toast.success("Status alterado com sucesso!");
+
       setStatus(response.data.status);
       router.refresh();
 
-      console.log(response.data);
     } catch (err) {
-      console.log(err);
-      // TODO: Implementar um Toast para notificar o erro de alteração do status
+      toast.error("Erro ao alterar status do ticket.");
     }
   };
 

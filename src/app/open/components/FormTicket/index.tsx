@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { api } from "@/lib/api";
 import { CustomerDataInfo } from "../../page";
+import { toast } from 'react-toastify';
 
 const schema = z.object({
   name: z.string().min(1, "O campo nome do chamado é obrigatório"),
@@ -29,15 +30,19 @@ export function FormTicket({ customer }: FormTicketProps) {
   });
 
   const handleRegisterTicket = async (data: FormData) => {
-    const response = await api.post("/api/ticket", {
-      name: data.name,
-      description: data.description,
-      customerId: customer.id
-    })
-
-    // TODO: Usar o Toast para mensagem
-    setValue("name", "")
-    setValue("description", "")
+    try {
+      const response = await api.post("/api/ticket", {
+        name: data.name,
+        description: data.description,
+        customerId: customer.id
+      });
+  
+      toast.success("Chamada registrada com sucesso!");
+      setValue("name", "");
+      setValue("description", "");
+    } catch (error) {
+      toast.error("Erro ao registrar chamada. Tente novamente.");
+    }
   };
 
   return (

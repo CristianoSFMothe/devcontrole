@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prismaClient from "@/lib/prisma";
+import { toast } from 'react-toastify';
 
 export default async function NewTicket() {
   const session = await getServerSession(authOptions);
@@ -26,22 +27,26 @@ export default async function NewTicket() {
     const customerId = formData.get("customer")
 
     if(!name || !description || !customerId) {
+      toast.error("Por favor, preencha todos os campos.");
       return;
-      // TODO: Usar o Toast para mensagem
     }
+    try{
+      await prismaClient.ticket.create({
+        data: {
+          name: name as string,
+          description: description as string,
+          customerId: customerId as string,
+          status: "ABERTO",
+          userId: session?.user.id
+        }
+      })
+  
+      toast.success("Chamada criada com sucesso!");
+      redirect("/dashboard");
 
-    await prismaClient.ticket.create({
-      data: {
-        name: name as string,
-        description: description as string,
-        customerId: customerId as string,
-        status: "ABERTO",
-        userId: session?.user.id
-      }
-    })
-
-    console.log("CHAMADA CRIADO COM SUCESSO!")
-    redirect("/dashboard");
+    } catch(error) {
+      toast.error("Erro ao criar chamada. Tente novamente.");
+    }
   }
 
   return (
